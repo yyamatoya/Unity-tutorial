@@ -121,6 +121,8 @@ public class OtherData : MonoBehaviour
 		{
 			var halo = (Behaviour)GetComponent("Halo");
 			halo.enabled = true;
+			
+			
 			Fight();
 		}
 	}

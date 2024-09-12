@@ -27,12 +27,35 @@ public class mainGameProgram : MonoBehaviour
 	Rigidbody rb = null;
 	Text message = null;
 
+	// ハイスコア機能
+	//	スコア表示用UI
+	Text score = null;
+	//	ハイスコア用UI
+	Text high = null;
+	// 情報メッセージ用UI
+	Text infoMessage = null;
+
+	//	開始時間
+	int EndTime = 1000;
+	//	スコア
+	int Score = 0;
+	// ハイスコア
+	int High = 0;
+
+
 	// Start is called before the first frame update
 	void Start()
 	{
 		rb = GetComponent<Rigidbody>();
 		message = GameObject.Find("Message").GetComponent<Text>();
+		/* スコア関連設定 */
+		score = GameObject.Find("Score").GetComponent<Text>();
+		high = GameObject.Find("High").GetComponent<Text>();
+		infoMessage = GameObject.Find("InfoMessage").GetComponent<Text>();
 
+		EndTime = (int)Time.time + 1000;
+		High = PlayerPrefs.GetInt("high");
+		high.text = "High Score: " + High;
 	}
 
 	private void FixedUpdate()
@@ -41,6 +64,14 @@ public class mainGameProgram : MonoBehaviour
 		{
 			return;
 		}
+		Score = EndTime - (int)Time.time;
+		score.text = "Time: " + Score;
+		if (Score <= 0)
+		{
+			Loss();
+			return;
+		}
+
 		var sv = transform.position;
 		sv.y = 1f;
 		Camera.main.transform.position = sv + cv;
@@ -93,12 +124,14 @@ public class mainGameProgram : MonoBehaviour
 				// ゲームオーバー
 				Loss();
 			}
-			else
-			{
-				//	勝った場合
-				Debug.Log("Player: Gotcha!");
-				AddExp(od.Level());
-			}
+
+		}
+		else
+		{
+			//	勝った場合
+			Debug.Log("Player: Gotcha!");
+			infoMessage.text = "経験値 " + od.Level() + "を取得しました!";
+			AddExp(od.Level());
 		}
 	}
 
@@ -184,5 +217,11 @@ public class mainGameProgram : MonoBehaviour
 		message.text = "WIN!!";
 		message.color = Color.yellow;
 		finish = true;
+		if (High < Score)
+		{
+			High = Score;
+			PlayerPrefs.SetInt("high", High);
+			high.text = "High Score: " + High;
+		}
 	}
 }

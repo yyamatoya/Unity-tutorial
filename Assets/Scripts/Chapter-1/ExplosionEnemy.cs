@@ -47,15 +47,15 @@ public class ExplosionEnemy : MonoBehaviour
 
 			ps = ex.GetComponent<ParticleSystem>();
 			ps.Play();
-			GameObject.Destroy(go);
 		}
 	}
 
 	private void OnTriggerExit(Collider other)
 	{
-		if (other.gameObject.tag == "Other")
+		if (other.gameObject.tag == "Other" && ps.isPlaying)
 		{
 			ps.Stop();
+			GameObject.Destroy(other.gameObject);
 		}
 	}
 
