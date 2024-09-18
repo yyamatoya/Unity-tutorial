@@ -43,6 +43,114 @@ public class mainGameProgram : MonoBehaviour
 	int High = 0;
 
 
+	// GameData本体
+	public GameData gameData;
+
+	void LoadGameData()
+	{
+		EndTime = (int)Time.time + gameData.score;
+		transform.position = gameData.position[4];
+		GetComponent<Rigidbody>().velocity = gameData.velocity[4];
+		// 初期設定（プレイヤー）の読み込み
+		param = new Dictionary<string, int>
+		{
+			{"power", gameData.param[4].power },
+			{"level", gameData.param[4].level },
+			{"exp", gameData.param[4].exp }
+		};
+		// 勝利フラグの読み込み
+		flag = new Dictionary<string, bool>
+		{
+			{"Sphere 0", gameData.flag[0] },
+			{"Sphere 1", gameData.flag[1] },
+			{"Sphere 2", gameData.flag[2] },
+			{"Sphere 3", gameData.flag[3] },
+		};
+
+		for (int i = 0; i < 4; i++)
+		{
+			var prm = new Dictionary<string, int>
+			{
+				{"power", gameData.param[i].power },
+				{"level", gameData.param[i].level },
+				{"exp", gameData.param[i].exp }
+			};
+			var obj = GameObject.Find("Sphere " + i);
+			obj.GetComponent<OtherData>().SetParam(prm);
+			obj.GetComponent<OtherData>().SetDv(gameData.dv[i]);
+			obj.transform.position = gameData.position[i];
+			obj.GetComponent<Rigidbody>().velocity = gameData.velocity[i];
+			obj.GetComponent<OtherData>().UpdateFromGameData();
+			Debug.Log("*** Load Data ***");
+			UpdateFromGameData();
+			message.text = "loaded.";
+			TimerStart();
+			Debug.Log("*** Load Data ***");
+
+		}
+	}
+
+	void UpdateFromGameData()
+	{
+		var objs = GameObject.FindGameObjectsWithTag("Other");
+		foreach (var obj in objs)
+		{
+			// 勝利フラグが立てば消滅
+			if (flag[obj.name] == true)
+			{
+				GameObject.Destroy(obj);
+			}
+		}
+	}
+
+	void SaveGameData()
+	{
+		// スコアの保存
+		gameData.score = Score;
+		gameData.param[4] = new ParamObject(
+			param["power"],
+			param["level"],
+			param["exp"]
+		);
+		gameData.position[4] = transform.position;
+		gameData.velocity[4] = GetComponent<Rigidbody>().velocity;
+
+		for (int i = 0; i < 4; i++)
+		{
+			var obj = GameObject.Find("Sphere " + i);
+			if (obj == null)
+			{
+				// 敵を探して存在しない場合はスキップする
+				continue;
+			}
+			var od = obj.GetComponent<OtherData>();
+			var prm = od.GetParam();
+			// gameDataに敵の体力などを保存（書き換え）
+			gameData.param[i] = new ParamObject(
+				prm["power"],
+				prm["level"],
+				prm["exp"]
+			);
+			// 速度も保存
+			gameData.dv[i] = obj.GetComponent<OtherData>().GetDv();
+			//	位置を記録
+			gameData.position[i] = obj.transform.position;
+			// 向いている方向
+			gameData.velocity[i] = obj.GetComponent<Rigidbody>().velocity;
+			// 勝利フラグの保存
+			gameData.flag = new bool[]
+			{
+				flag["Sphere 0"],
+				flag["Sphere 1"],
+				flag["Sphere 2"],
+				flag["Sphere 3"]
+			};
+			message.text = "saved.";
+			TimerStart();
+			Debug.Log("*** save data ***");
+		}
+	}
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -56,6 +164,7 @@ public class mainGameProgram : MonoBehaviour
 		EndTime = (int)Time.time + 1000;
 		High = PlayerPrefs.GetInt("high");
 		high.text = "High Score: " + High;
+		LoadGameData();
 	}
 
 	private void FixedUpdate()
@@ -63,6 +172,10 @@ public class mainGameProgram : MonoBehaviour
 		if (Finish())
 		{
 			return;
+		}
+		else if (Input.GetKeyDown(KeyCode.Space))
+		{
+			SaveGameData();
 		}
 		Score = EndTime - (int)Time.time;
 		score.text = "Time: " + Score;
@@ -156,7 +269,7 @@ public class mainGameProgram : MonoBehaviour
 		flag[flg] = true;
 		if (CheckFlg())
 		{
-			// フラグを確認してTrueなら終了
+			// フラグを確認して全てTrueなら終了
 			Win();
 		}
 	}
@@ -164,16 +277,6 @@ public class mainGameProgram : MonoBehaviour
 
 	bool CheckFlg()
 	{
-		//var f = true;
-		//foreach (var item in flag)
-		//{
-		//	if (item.Value == false)
-		//	{
-		//		f = false;
-		//	}
-		//}
-		//return f; // すべてtrueならtrue
-
 		return !flag.ContainsValue(false);
 	}
 
@@ -210,6 +313,7 @@ public class mainGameProgram : MonoBehaviour
 		message.text = "GAME OVER";
 		message.color = Color.red;
 		finish = true;
+		gameData.InitData();
 	}
 
 	void Win()
@@ -223,5 +327,6 @@ public class mainGameProgram : MonoBehaviour
 			PlayerPrefs.SetInt("high", High);
 			high.text = "High Score: " + High;
 		}
+		gameData.InitData();
 	}
 }

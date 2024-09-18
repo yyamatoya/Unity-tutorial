@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aa0897593893f84c9af7f7fdae55c3a, type: 3}
+  m_Name: game_data
+  m_EditorClassIdentifier: 
+  score: 961
+  flag: 00000000
+  dv:
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  param:
+  - power: 100
+    level: 1
+    exp: 100
+  - power: 100
+    level: 1
+    exp: 100
+  - power: 100
+    level: 1
+    exp: 100
+  - power: 100
+    level: 1
+    exp: 100
+  - power: 93
+    level: 2
+    exp: 93
+  position:
+  - {x: 10.751489, y: 0.5, z: -39.669903}
+  - {x: 10.052252, y: 0.5, z: -38.955013}
+  - {x: 11.0126295, y: 0.5, z: -38.676315}
+  - {x: 9.430345, y: 0.5, z: -38.171913}
+  - {x: 5.684647, y: 0.5, z: -40.334988}
+  velocity:
+  - {x: -0.71357554, y: 0, z: 0.540355}
+  - {x: -0.6714279, y: 0, z: 0.58169985}
+  - {x: -0.6707644, y: 0, z: 0.5795108}
+  - {x: -0.56603277, y: 0, z: 0.665621}
+  - {x: -0.050518967, y: 0, z: -0.00010576226}
