@@ -17,10 +17,19 @@ public class UsePlayableGraph : MonoBehaviour
 	PlayableGraph pg;
 	AnimationClipPlayable acp;
 
+	bool flag = true;
+	ScriptPlayable<AnimSpherePlayableBehavior> pb;
+
+
 	// Start is called before the first frame update
 	void Start()
 	{
 		pg = CreatePlayableGraph(startPosition, length, width, second, count);
+		pb = ScriptPlayable<AnimSpherePlayableBehavior>.Create(pg);
+		pb.GetBehaviour().Sphere = sphere;
+		var op = AnimationPlayableOutput.Create(pg, "Animation", sphere.GetComponent<Animator>());
+		op.SetSourcePlayable(pb);
+		pg.Play();
 	}
 
 	// Update is called once per frame
@@ -28,7 +37,7 @@ public class UsePlayableGraph : MonoBehaviour
 	{
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
-			if (pg.IsPlaying())
+			if (flag)
 			{
 				pg.Stop();
 			}
@@ -36,6 +45,24 @@ public class UsePlayableGraph : MonoBehaviour
 			{
 				pg.Play();
 			}
+			//	acp.SetSpeed(acp.GetSpeed() * -1);
+			//	acp.Play();
+			flag = !flag;
+		}
+		if (Input.GetKeyDown(KeyCode.Return))
+		{
+			acp.SetTime(0);
+			acp.SetSpeed(1);
+			acp.Play();
+		}
+		if (Input.GetKeyDown(KeyCode.RightArrow))
+		{
+			acp.SetSpeed(acp.GetSpeed() + 0.1f);
+		}
+
+		if (Input.GetKeyDown(KeyCode.LeftArrow))
+		{
+			acp.SetSpeed(acp.GetSpeed() - 0.1f);
 		}
 	}
 
