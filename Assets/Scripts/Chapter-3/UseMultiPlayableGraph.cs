@@ -4,21 +4,12 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-public class UsePlayableGraph : MonoBehaviour
+public class UseMultiPlayableGraph : MonoBehaviour
 {
-	public Vector3 startPosition = new Vector3(0f, 1f, 100f);
-	public float length = 100f;
-	public float width = 10f;
-
-	public float second = 10f;
-	public int count = 10;
-
+	bool flag = true;
 	GameObject sphere;
 	PlayableGraph pg;
-	AnimationClipPlayable acp;
 
-	float weight = 0f; // MixPlayableのウェイト
-	bool flag = true;
 	ScriptPlayable<AnimSpherePlayableBehavior> pb;
 	AnimationMixerPlayable mxp;
 
@@ -26,12 +17,24 @@ public class UsePlayableGraph : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-		pg = CreatePlayableGraph(startPosition, length, width, second, count);
+		pg = PlayableGraph.Create();
+		var (acp0, go0) = CreateACP(pg);
+		var (acp1, go1) = CreateACP(pg);
+		var (acp2, go2) = CreateACP(pg);
+		var (acp3, go3) = CreateACP(pg);
+
 		pb = ScriptPlayable<AnimSpherePlayableBehavior>.Create(pg);
-		//pb.GetBehaviour().Sphere = sphere;
-		var op = AnimationPlayableOutput.Create(pg, "Animation", sphere.GetComponent<Animator>());
-		op.SetSourcePlayable(pb);
+		pb.GetBehaviour().Spheres = new GameObject[] { go0, go1, go2, go3 };
+
+		var op0 = AnimationPlayableOutput.Create(pg, "Animation", go0.GetComponent<Animator>());
+		op0.SetSourcePlayable(pb);
+		var op1 = AnimationPlayableOutput.Create(pg, "Animation", go1.GetComponent<Animator>());
+		op1.SetSourcePlayable(pb);
+		var op2 = AnimationPlayableOutput.Create(pg, "Animation", go2.GetComponent<Animator>());
+		op2.SetSourcePlayable(pb);
+
 		pg.Play();
+
 	}
 
 	// Update is called once per frame
@@ -57,26 +60,38 @@ public class UsePlayableGraph : MonoBehaviour
 		//	acp.SetSpeed(1);
 		//	acp.Play();
 		//}
-		if (Input.GetKeyDown(KeyCode.RightArrow))
-		{
-			mxp.SetSpeed(mxp.GetSpeed() + 0.1f);
-			//acp.SetSpeed(acp.GetSpeed() + 0.1f);
-		}
-		if (Input.GetKeyDown(KeyCode.LeftArrow))
-		{
-			mxp.SetSpeed(mxp.GetSpeed() - 0.1f);
-			//acp.SetSpeed(acp.GetSpeed() - 0.1f);
-		}
-		if (Input.GetKeyDown(KeyCode.UpArrow))
-		{
-			weight += 0.1f;
-		}
-		if (Input.GetKeyDown(KeyCode.DownArrow))
-		{
-			weight -= 0.1f;
-		}
-		mxp.SetInputWeight(0, 1.0f - weight);
-		mxp.SetInputWeight(1, weight);
+	}
+
+	(AnimationClipPlayable, GameObject) CreateACP(PlayableGraph pg)
+	{
+		var x = Random.Range(-10f, 10f);
+		var y = Random.Range(0f, 5f);
+		var z = Random.Range(10f, 100f);
+
+		var line = z;
+		var width = Random.Range(-10f, 10f);
+		var time = (int)Random.Range(5f, 25f);
+		var second = line / time;
+		var v = new Vector3(x, y, z);
+
+		// Sphereの作成
+		var sph = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		sph.transform.position = v;
+		var rdr = sph.GetComponent<Renderer>();
+		rdr.material = new Material(Shader.Find("Standard"));
+		rdr.material.color = Color.magenta;
+
+		var animator = sph.AddComponent<Animator>();
+
+		var clip = CreateAnimationClip(v, line, width, second, time);
+		animator.applyRootMotion = true;
+		var acp = AnimationClipPlayable.Create(pg, clip);
+
+		var op = AnimationPlayableOutput.Create(pg, "Animator", animator);
+		op.SetSourcePlayable(acp);
+
+		return (acp, sph);
+
 	}
 
 	PlayableGraph CreatePlayableGraph(Vector3 pos, float ln, float wh, float sec, int count)

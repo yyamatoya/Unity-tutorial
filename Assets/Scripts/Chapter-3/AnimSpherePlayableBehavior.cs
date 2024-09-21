@@ -6,29 +6,35 @@ using UnityEngine.Playables;
 // A behaviour that is attached to a playable
 public class AnimSpherePlayableBehavior : PlayableBehaviour
 {
-	public GameObject Sphere;
+	public GameObject[] Spheres;
 	int count = 0;
 	bool flag = false;
 	// Called when the owning graph starts playing
 	public override void OnGraphStart(Playable playable)
 	{
 		Debug.Log("OnGraphStart");
-		if (Sphere == null)
+		if (Spheres == null)
 		{
 			return;
 		}
-		Sphere.GetComponent<Renderer>().material.color = Color.magenta;
+		foreach (var Sphere in Spheres)
+		{
+			Sphere.GetComponent<Renderer>().material.color = Color.magenta;
+		}
 	}
 
 	// Called when the owning graph stops playing
 	public override void OnGraphStop(Playable playable)
 	{
 		Debug.Log("OnGraphStop");
-		if (Sphere == null)
+		if (Spheres == null)
 		{
 			return;
 		}
-		Sphere.GetComponent<Renderer>().material.color = Color.black;
+		foreach (var Sphere in Spheres)
+		{
+			Sphere.GetComponent<Renderer>().material.color = Color.black;
+		}
 	}
 
 	// Called when the state of the playable is set to Play
@@ -47,26 +53,29 @@ public class AnimSpherePlayableBehavior : PlayableBehaviour
 	public override void PrepareFrame(Playable playable, FrameData info)
 	{
 		Debug.Log("PrepareFrame");
-		if (Sphere == null)
+		if (Spheres == null)
 		{
 			return;
 		}
-		var renderer = Sphere.GetComponent<Renderer>();
-		if (flag == true)
+		foreach (var Sphere in Spheres)
 		{
-			var color = renderer.material.color;
-			color.r -= 0.02f;
-			color.g += 0.02f;
-			//color.b -= 0.02f;
-			renderer.material.color = color;
-		}
-		else
-		{
-			var color = renderer.material.color;
-			color.r += 0.02f;
-			color.g -= 0.02f;
-			//color.b -= 0.02f;
-			renderer.material.color = color;
+			var renderer = Sphere.GetComponent<Renderer>();
+			if (flag == true)
+			{
+				var color = renderer.material.color;
+				color.r -= 0.02f;
+				color.g += 0.02f;
+				//color.b -= 0.02f;
+				renderer.material.color = color;
+			}
+			else
+			{
+				var color = renderer.material.color;
+				color.r += 0.02f;
+				color.g -= 0.02f;
+				//color.b -= 0.02f;
+				renderer.material.color = color;
+			}
 		}
 		count++;
 		if (count == 50)
