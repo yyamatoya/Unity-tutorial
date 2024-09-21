@@ -32,6 +32,8 @@ public class UseMultiPlayableGraph : MonoBehaviour
 		op1.SetSourcePlayable(pb);
 		var op2 = AnimationPlayableOutput.Create(pg, "Animation", go2.GetComponent<Animator>());
 		op2.SetSourcePlayable(pb);
+		var op3 = AnimationPlayableOutput.Create(pg, "Animation", go3.GetComponent<Animator>());
+		op3.SetSourcePlayable(pb);
 
 		pg.Play();
 
